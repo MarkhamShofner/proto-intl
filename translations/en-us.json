@@ -1,4 +1,8 @@
 {
-  "foo": "foo",
-  "bar": "bar"
+  "noteworthy": {
+    "title": "Ready Player One"
+  },
+  "band": {
+    "rock": "Rush"
+  }
 }

@@ -1,6 +1,8 @@
-/*jshint node:true*/
+/* jshint node:true */
 
-module.exports = function(/* env */) {
+module.exports = function (environment) {
+  const disablePolyfill = environment === 'development' || environment === 'test';
+
   return {
     /**
     * The locales that are application supports.
@@ -15,7 +17,7 @@ module.exports = function(/* env */) {
     * @type {Array?}
     * @default "null"
     */
-    locales: null,
+    locales: [ 'cs', 'da', 'de', 'en-us', 'es', 'et', 'el', 'fi', 'fr', 'it', 'ja', 'ko', 'lt', 'lv', 'nb', 'nl', 'pl', 'pt-br', 'pt-pt', 'ro', 'ru', 'sv', 'th', 'tr', 'vi', 'zh-hans', 'zh-hant', 'zh' ],
 
     /**
     * baseLocale is used to determine if translation keys are missing from other locales.
@@ -26,17 +28,8 @@ module.exports = function(/* env */) {
     * @type {String?}
     * @default "null"
     */
-    baseLocale: null,
-
-    /**
-    * autoPolyfill, when true will automatically inject the IntlJS polyfill
-    * into index.html
-    *
-    * @property autoPolyfill
-    * @type {Boolean}
-    * @default "false"
-    */
-    autoPolyfill: false,
+    // baseLocale: null,
+    baseLocale: 'en-us',
 
     /**
     * disablePolyfill prevents the polyfill from being bundled in the asset folder of the build
@@ -45,22 +38,19 @@ module.exports = function(/* env */) {
     * @type {Boolean}
     * @default "false"
     */
-    disablePolyfill: false,
+    disablePolyfill: disablePolyfill,
 
     /**
     * prevents the translations from being bundled with the application code.
     * This enables asynchronously loading the translations for the active locale
     * by fetching them from the asset folder of the build.
     *
-    * See: https://github.com/jasonmit/ember-intl/wiki/Asynchronously-loading-translations
+    * See: https://github.com/yahoo/ember-intl/wiki/Asynchronously-loading-translations
     *
     * @property publicOnly
     * @type {Boolean}
     * @default "false"
     */
-    publicOnly: false,
-
-    inputPath: 'translations',
-    outputPath: 'translations'
+    publicOnly: false
   };
 };
