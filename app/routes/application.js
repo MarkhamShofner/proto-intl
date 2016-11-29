@@ -1,43 +1,46 @@
 import Ember from 'ember';
-// import ENV from 'opendata-ui/config/environment';
-// import sitelinks from 'opendata-ui/utils/sitelinks';
+import ENV from '../config/environment';
 
 export default Ember.Route.extend({
 
   intl: Ember.inject.service(),
-  // appSettings: Ember.inject.service(),
-  // headData: Ember.inject.service(),
   ajax: Ember.inject.service(),
 
   init () {
     this._super(...arguments);
-    // Ember.debug('application route:init');
-
-    // this._addSiteLinksJson()
-    // this *should* be injected into the applcation route by torii,  but apparently is not
-
   },
 
   beforeModel: function () {
-    // NOTE: we used to (and i'd prefer to) do this in an instance initializer
-    // but that stopped working at rc.7 of ember-intl
     const intl = this.get('intl');
-
     let defaultLocale = 'en-us';
     let translationKey = this._calculateTranslationKey(defaultLocale);
 
     intl.setLocale(defaultLocale);
 
+    // overwrite function in -intl adapter to add flag for pending translations
+    intl.get('adapter').reopen({
+      findTranslationByKey: function (locales, translationKey) {
+        const len = locales.length;
+        let i = 0;
+        const baseLocale = locales[0];
+
+        for (; i < len; i++) {
+          const locale = locales[i];
+          const translations = this.translationsFor(locale);
+          if (translations && translations.has(translationKey)) {
+            if (locale !== baseLocale) {
+              return '^*^' + translations.getValue(translationKey) + '^*^';
+            } else {
+              return translations.getValue(translationKey);
+            }
+          }
+        }
+      }
+    });
+
     // if we got null, we want to use the default locale
     // which we should already have in the browser...
     if (translationKey !== defaultLocale) {
-      // load the polyfill
-      // this._loadPolyfill(translationKey);
-
-      // set locale on ags oauth provider
-      // const owner = Ember.getOwner(this);
-      // const agsAuthProvider = owner.lookup('torii-provider:arcgis-oauth-bearer');
-      // agsAuthProvider.set('locale', translationKey);
 
       // sideload the translation
       // return is important so the transition pauses until the promise resolves
@@ -54,24 +57,7 @@ export default Ember.Route.extend({
     return this._initSession();
   },
 
-  // _addSiteLinksJson () {
-  //   // this enables google to put a search box on results that include this site
-  //   // see https://developers.google.com/search/docs/data-types/sitelinks-searchbox
-  //   const rootUrl = this.get('appSettings.url');
-  //   const siteName = this.get('appSettings.title');
-  //   const jsonLd = sitelinks(rootUrl, siteName);
-  //   const script = Ember.String.htmlSafe(`<script class="jsonld_sitelinks" type="application/ld+json">${JSON.stringify(jsonLd, null, 2)}</script>`);
-  //   this.get('headData').set('sitelinks', script);
-  // },
-
   _initSession () {
-    // return this.get('session').fetch()
-    //   .then(() => {
-    //     Ember.debug('User has been automatically logged in... ');
-    //   })
-    //   .catch(() => {
-    //     Ember.debug('No cookie was found, user is anonymous... ');
-    //   });
   },
 
   _loadPolyfill (locale) {
@@ -163,31 +149,5 @@ export default Ember.Route.extend({
     }
 
     return null;
-  },
-
-  // headTags: function () {
-  //   const appSettings = this.get('appSettings');
-  //   return [{
-  //     type: 'meta',
-  //     tagId: 'meta-application-name',
-  //     attrs: {
-  //       name: 'application-name',
-  //       content: appSettings.get('title'),
-  //     },
-  //   }];
-  // },
-
-  // actions: {
-  //   didTransition () {
-  //     Ember.run.once(this, function () {
-  //       this.telemetry.logPageView(this.router.get('url'));
-  //     });
-  //   },
-  //   accessDenied: function () {
-  //     console.error('WE NEED TO DO SOMETHING WHEN THE AUTH FAILS... or maybe not?');
-  //   },
-  //   error: function () {
-  //     this.transitionTo('catchall', '404');
-  //   },
-  // },
+  }
 });
