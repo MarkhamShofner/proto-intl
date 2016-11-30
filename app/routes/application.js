@@ -29,7 +29,7 @@ export default Ember.Route.extend({
           const translations = this.translationsFor(locale);
           if (translations && translations.has(translationKey)) {
             if (locale !== chosenLocale && ENV.environment === 'production') {
-              return '^*^' + translations.getValue(translationKey) + '^*^';
+              return '^*' + translations.getValue(translationKey) + '*^';
             } else {
               return translations.getValue(translationKey);
             }
