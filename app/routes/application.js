@@ -22,13 +22,13 @@ export default Ember.Route.extend({
       findTranslationByKey: function (locales, translationKey) {
         const len = locales.length;
         let i = 0;
-        const baseLocale = locales[0];
+        const chosenLocale = locales[0];
 
         for (; i < len; i++) {
           const locale = locales[i];
           const translations = this.translationsFor(locale);
           if (translations && translations.has(translationKey)) {
-            if (locale !== baseLocale) {
+            if (locale !== chosenLocale && ENV.environment === 'production') {
               return '^*^' + translations.getValue(translationKey) + '^*^';
             } else {
               return translations.getValue(translationKey);
